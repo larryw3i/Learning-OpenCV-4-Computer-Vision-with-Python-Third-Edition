@@ -11,11 +11,13 @@ class Face(object):
         self.leftEyeRect = None
         self.rightEyeRect = None
 
+
 class FaceTracker(object):
     """A tracker for facial features: face, eyes."""
 
-    def __init__(self, scaleFactor = 1.2, minNeighbors = 2,
-                 flags = cv2.CASCADE_SCALE_IMAGE):
+    def __init__(
+        self, scaleFactor=1.2, minNeighbors=2, flags=cv2.CASCADE_SCALE_IMAGE
+    ):
 
         self.scaleFactor = scaleFactor
         self.minNeighbors = minNeighbors
@@ -24,9 +26,11 @@ class FaceTracker(object):
         self._faces = []
 
         self._faceClassifier = cv2.CascadeClassifier(
-            'cascades/haarcascade_frontalface_alt.xml')
+            "cascades/haarcascade_frontalface_alt.xml"
+        )
         self._eyeClassifier = cv2.CascadeClassifier(
-            'cascades/haarcascade_eye.xml')
+            "cascades/haarcascade_eye.xml"
+        )
 
     @property
     def faces(self):
@@ -47,8 +51,8 @@ class FaceTracker(object):
         minSize = utils.widthHeightDividedBy(image, 8)
 
         faceRects = self._faceClassifier.detectMultiScale(
-            image, self.scaleFactor, self.minNeighbors, self.flags,
-            minSize)
+            image, self.scaleFactor, self.minNeighbors, self.flags, minSize
+        )
 
         if faceRects is not None:
             for faceRect in faceRects:
@@ -59,36 +63,38 @@ class FaceTracker(object):
                 x, y, w, h = faceRect
 
                 # Seek an eye in the upper-left part of the face.
-                searchRect = (x+w//7, y, w*2//7, h//2)
+                searchRect = (x + w // 7, y, w * 2 // 7, h // 2)
                 face.leftEyeRect = self._detectOneObject(
-                    self._eyeClassifier, image, searchRect, 64)
+                    self._eyeClassifier, image, searchRect, 64
+                )
 
                 # Seek an eye in the upper-right part of the face.
-                searchRect = (x+w*4//7, y, w*2//7, h//2)
+                searchRect = (x + w * 4 // 7, y, w * 2 // 7, h // 2)
                 face.rightEyeRect = self._detectOneObject(
-                    self._eyeClassifier, image, searchRect, 64)
+                    self._eyeClassifier, image, searchRect, 64
+                )
 
                 self._faces.append(face)
 
-    def _detectOneObject(self, classifier, image, rect,
-                          imageSizeToMinSizeRatio):
+    def _detectOneObject(
+        self, classifier, image, rect, imageSizeToMinSizeRatio
+    ):
 
         x, y, w, h = rect
 
-        minSize = utils.widthHeightDividedBy(
-            image, imageSizeToMinSizeRatio)
+        minSize = utils.widthHeightDividedBy(image, imageSizeToMinSizeRatio)
 
-        subImage = image[y:y+h, x:x+w]
+        subImage = image[y : y + h, x : x + w]
 
         subRects = classifier.detectMultiScale(
-            subImage, self.scaleFactor, self.minNeighbors,
-            self.flags, minSize)
+            subImage, self.scaleFactor, self.minNeighbors, self.flags, minSize
+        )
 
         if len(subRects) == 0:
             return None
 
         subX, subY, subW, subH = subRects[0]
-        return (x+subX, y+subY, subW, subH)
+        return (x + subX, y + subY, subW, subH)
 
     def drawDebugRects(self, image):
         """Draw rectangles around the tracked facial features."""
@@ -98,12 +104,11 @@ class FaceTracker(object):
             leftEyeColor = 255
             rightEyeColor = 255
         else:
-            faceColor = (255, 255, 255) # white
-            leftEyeColor = (0, 0, 255) # red
-            rightEyeColor = (0, 255, 255) # yellow
+            faceColor = (255, 255, 255)  # white
+            leftEyeColor = (0, 0, 255)  # red
+            rightEyeColor = (0, 255, 255)  # yellow
 
         for face in self.faces:
             rects.outlineRect(image, face.faceRect, faceColor)
             rects.outlineRect(image, face.leftEyeRect, leftEyeColor)
-            rects.outlineRect(image, face.rightEyeRect,
-                              rightEyeColor)
+            rects.outlineRect(image, face.rightEyeRect, rightEyeColor)

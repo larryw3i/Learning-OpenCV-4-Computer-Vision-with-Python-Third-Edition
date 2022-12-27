@@ -19,11 +19,13 @@ def createLookupArray(func, length=256):
         i += 1
     return lookupArray
 
+
 def applyLookupArray(lookupArray, src, dst):
     """Map a source to a destination using a lookup."""
     if lookupArray is None:
         return
     dst[:] = lookupArray[src]
+
 
 def createCurveFunc(points):
     """Return a function derived from control points."""
@@ -34,13 +36,13 @@ def createCurveFunc(points):
         return None
     xs, ys = zip(*points)
     if numPoints < 3:
-        kind = 'linear'
+        kind = "linear"
     elif numPoints < 4:
-        kind = 'quadratic'
+        kind = "quadratic"
     else:
-        kind = 'cubic'
-    return scipy.interpolate.interp1d(xs, ys, kind,
-                                      bounds_error = False)
+        kind = "cubic"
+    return scipy.interpolate.interp1d(xs, ys, kind, bounds_error=False)
+
 
 def createCompositeFunc(func0, func1):
     """Return a composite of two functions."""

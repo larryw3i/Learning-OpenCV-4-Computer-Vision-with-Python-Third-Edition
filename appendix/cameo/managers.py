@@ -6,9 +6,9 @@ import utils
 
 
 class CaptureManager(object):
-
-    def __init__(self, capture, previewWindowManager = None,
-                 shouldMirrorPreview = False):
+    def __init__(
+        self, capture, previewWindowManager=None, shouldMirrorPreview=False
+    ):
 
         self.previewWindowManager = previewWindowManager
         self.shouldMirrorPreview = shouldMirrorPreview
@@ -39,8 +39,7 @@ class CaptureManager(object):
     @property
     def frame(self):
         if self._enteredFrame and self._frame is None:
-            _, self._frame = self._capture.retrieve(
-                    self._frame, self.channel)
+            _, self._frame = self._capture.retrieve(self._frame, self.channel)
         return self._frame
 
     @property
@@ -55,8 +54,9 @@ class CaptureManager(object):
         """Capture the next frame, if any."""
 
         # But first, check that any previous frame was exited.
-        assert not self._enteredFrame, \
-            'previous enterFrame() had no matching exitFrame()'
+        assert (
+            not self._enteredFrame
+        ), "previous enterFrame() had no matching exitFrame()"
 
         if self._capture is not None:
             self._enteredFrame = self._capture.grab()
@@ -75,7 +75,7 @@ class CaptureManager(object):
             self._startTime = time.time()
         else:
             timeElapsed = time.time() - self._startTime
-            self._fpsEstimate =  self._framesElapsed / timeElapsed
+            self._fpsEstimate = self._framesElapsed / timeElapsed
         self._framesElapsed += 1
 
         # Draw to the window, if any.
@@ -103,8 +103,8 @@ class CaptureManager(object):
         self._imageFilename = filename
 
     def startWritingVideo(
-            self, filename,
-            encoding = cv2.VideoWriter_fourcc('M','J','P','G')):
+        self, filename, encoding=cv2.VideoWriter_fourcc("M", "J", "P", "G")
+    ):
         """Start writing exited frames to a video file."""
         self._videoFilename = filename
         self._videoEncoding = encoding
@@ -130,20 +130,19 @@ class CaptureManager(object):
                     return
                 else:
                     fps = self._fpsEstimate
-            size = (int(self._capture.get(
-                        cv2.CAP_PROP_FRAME_WIDTH)),
-                    int(self._capture.get(
-                        cv2.CAP_PROP_FRAME_HEIGHT)))
+            size = (
+                int(self._capture.get(cv2.CAP_PROP_FRAME_WIDTH)),
+                int(self._capture.get(cv2.CAP_PROP_FRAME_HEIGHT)),
+            )
             self._videoWriter = cv2.VideoWriter(
-                self._videoFilename, self._videoEncoding,
-                fps, size)
+                self._videoFilename, self._videoEncoding, fps, size
+            )
 
         self._videoWriter.write(self._frame)
 
 
 class WindowManager(object):
-
-    def __init__(self, windowName, keypressCallback = None):
+    def __init__(self, windowName, keypressCallback=None):
         self.keypressCallback = keypressCallback
 
         self._windowName = windowName
@@ -169,8 +168,8 @@ class WindowManager(object):
         if self.keypressCallback is not None and keycode != -1:
             self.keypressCallback(keycode)
 
-class PygameWindowManager(WindowManager):
 
+class PygameWindowManager(WindowManager):
     def createWindow(self):
         pygame.display.init()
         pygame.display.set_caption(self._windowName)
@@ -190,7 +189,8 @@ class PygameWindowManager(WindowManager):
 
         # Convert the frame to Pygame's Surface type.
         pygameFrame = pygame.image.frombuffer(
-            rgbFrame.tostring(), frameSize, 'RGB')
+            rgbFrame.tostring(), frameSize, "RGB"
+        )
 
         # Resize the window to match the frame.
         displaySurface = pygame.display.set_mode(frameSize)
@@ -205,8 +205,10 @@ class PygameWindowManager(WindowManager):
 
     def processEvents(self):
         for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN and \
-                    self.keypressCallback is not None:
+            if (
+                event.type == pygame.KEYDOWN
+                and self.keypressCallback is not None
+            ):
                 self.keypressCallback(event.key)
             elif event.type == pygame.QUIT:
                 self.destroyWindow()

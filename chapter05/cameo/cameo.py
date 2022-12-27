@@ -5,13 +5,13 @@ from managers import WindowManager, CaptureManager
 import rects
 from trackers import FaceTracker
 
-class Cameo(object):
 
+class Cameo(object):
     def __init__(self):
-        self._windowManager = WindowManager('Cameo',
-                                            self.onKeypress)
+        self._windowManager = WindowManager("Cameo", self.onKeypress)
         self._captureManager = CaptureManager(
-            cv2.VideoCapture(0), self._windowManager, True)
+            cv2.VideoCapture(0), self._windowManager, True
+        )
         self._faceTracker = FaceTracker()
         self._shouldDrawDebugRects = False
         self._curveFilter = filters.BGRPortraCurveFilter()
@@ -27,8 +27,9 @@ class Cameo(object):
 
                 self._faceTracker.update(frame)
                 faces = self._faceTracker.faces
-                rects.swapRects(frame, frame,
-                                [face.faceRect for face in faces])
+                rects.swapRects(
+                    frame, frame, [face.faceRect for face in faces]
+                )
 
                 filters.strokeEdges(frame, frame)
                 self._curveFilter.apply(frame, frame)
@@ -48,26 +49,23 @@ class Cameo(object):
         escape -> Quit.
 
         """
-        if keycode == 32: # space
-            self._captureManager.writeImage('screenshot.png')
-        elif keycode == 9: # tab
+        if keycode == 32:  # space
+            self._captureManager.writeImage("screenshot.png")
+        elif keycode == 9:  # tab
             if not self._captureManager.isWritingVideo:
-                self._captureManager.startWritingVideo(
-                    'screencast.avi')
+                self._captureManager.startWritingVideo("screencast.avi")
             else:
                 self._captureManager.stopWritingVideo()
-        elif keycode == 120: # x
-            self._shouldDrawDebugRects = \
-                not self._shouldDrawDebugRects
-        elif keycode == 27: # escape
+        elif keycode == 120:  # x
+            self._shouldDrawDebugRects = not self._shouldDrawDebugRects
+        elif keycode == 27:  # escape
             self._windowManager.destroyWindow()
 
-class CameoDouble(Cameo):
 
+class CameoDouble(Cameo):
     def __init__(self):
         Cameo.__init__(self)
-        self._hiddenCaptureManager = CaptureManager(
-            cv2.VideoCapture(1))
+        self._hiddenCaptureManager = CaptureManager(cv2.VideoCapture(1))
 
     def run(self):
         """Run the main loop."""
@@ -88,8 +86,11 @@ class CameoDouble(Cameo):
                     i = 0
                     while i < len(faces) and i < len(hiddenFaces):
                         rects.copyRect(
-                            hiddenFrame, frame, hiddenFaces[i].faceRect,
-                            faces[i].faceRect)
+                            hiddenFrame,
+                            frame,
+                            hiddenFaces[i].faceRect,
+                            faces[i].faceRect,
+                        )
                         i += 1
 
                 filters.strokeEdges(frame, frame)
@@ -102,15 +103,17 @@ class CameoDouble(Cameo):
             self._hiddenCaptureManager.exitFrame()
             self._windowManager.processEvents()
 
-class CameoDepth(Cameo):
 
+class CameoDepth(Cameo):
     def __init__(self):
-        self._windowManager = WindowManager('Cameo',
-                                            self.onKeypress)
-        #device = cv2.CAP_OPENNI2 # uncomment for Microsoft Kinect via OpenNI2
-        device = cv2.CAP_OPENNI2_ASUS # uncomment for Asus Xtion or Occipital Structure via OpenNI2
+        self._windowManager = WindowManager("Cameo", self.onKeypress)
+        # device = cv2.CAP_OPENNI2 # uncomment for Microsoft Kinect via OpenNI2
+        device = (
+            cv2.CAP_OPENNI2_ASUS
+        )  # uncomment for Asus Xtion or Occipital Structure via OpenNI2
         self._captureManager = CaptureManager(
-            cv2.VideoCapture(device), self._windowManager, True)
+            cv2.VideoCapture(device), self._windowManager, True
+        )
         self._faceTracker = FaceTracker()
         self._shouldDrawDebugRects = False
         self._curveFilter = filters.BGRPortraCurveFilter()
@@ -137,11 +140,13 @@ class CameoDepth(Cameo):
                 faces = self._faceTracker.faces
                 masks = [
                     depth.createMedianMask(
-                        disparityMap, validDepthMask, face.faceRect) \
+                        disparityMap, validDepthMask, face.faceRect
+                    )
                     for face in faces
                 ]
-                rects.swapRects(frame, frame,
-                                [face.faceRect for face in faces], masks)
+                rects.swapRects(
+                    frame, frame, [face.faceRect for face in faces], masks
+                )
 
                 if self._captureManager.channel == cv2.CAP_OPENNI_BGR_IMAGE:
                     # A BGR frame was captured.
@@ -155,7 +160,8 @@ class CameoDepth(Cameo):
             self._captureManager.exitFrame()
             self._windowManager.processEvents()
 
-if __name__=="__main__":
-    #Cameo().run() # uncomment for single camera
-    #CameoDouble().run() # uncomment for double camera
-    CameoDepth().run() # uncomment for depth camera
+
+if __name__ == "__main__":
+    # Cameo().run() # uncomment for single camera
+    # CameoDouble().run() # uncomment for double camera
+    CameoDepth().run()  # uncomment for depth camera

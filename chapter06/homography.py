@@ -4,10 +4,8 @@ from matplotlib import pyplot as plt
 
 MIN_NUM_GOOD_MATCHES = 10
 
-img0 = cv2.imread('../images/tattoos/query.png',
-                  cv2.IMREAD_GRAYSCALE)
-img1 = cv2.imread('../images/tattoos/anchor-man.png',
-                  cv2.IMREAD_GRAYSCALE)
+img0 = cv2.imread("../images/tattoos/query.png", cv2.IMREAD_GRAYSCALE)
+img1 = cv2.imread("../images/tattoos/anchor-man.png", cv2.IMREAD_GRAYSCALE)
 
 # Perform SIFT feature detection and description.
 sift = cv2.SIFT_create()
@@ -30,17 +28,20 @@ for m, n in matches:
         good_matches.append(m)
 
 if len(good_matches) >= MIN_NUM_GOOD_MATCHES:
-    src_pts = np.float32(
-        [kp0[m.queryIdx].pt for m in good_matches]).reshape(-1, 1, 2)
-    dst_pts = np.float32(
-        [kp1[m.trainIdx].pt for m in good_matches]).reshape(-1, 1, 2)
+    src_pts = np.float32([kp0[m.queryIdx].pt for m in good_matches]).reshape(
+        -1, 1, 2
+    )
+    dst_pts = np.float32([kp1[m.trainIdx].pt for m in good_matches]).reshape(
+        -1, 1, 2
+    )
 
     M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 5.0)
     mask_matches = mask.ravel().tolist()
 
     h, w = img0.shape
     src_corners = np.float32(
-        [[0, 0], [0, h-1], [w-1, h-1], [w-1, 0]]).reshape(-1, 1, 2)
+        [[0, 0], [0, h - 1], [w - 1, h - 1], [w - 1, 0]]
+    ).reshape(-1, 1, 2)
     dst_corners = cv2.perspectiveTransform(src_corners, M)
     dst_corners = dst_corners.astype(np.int32)
 
@@ -57,13 +58,23 @@ if len(good_matches) >= MIN_NUM_GOOD_MATCHES:
 
     # Draw the matches that passed the ratio test.
     img_matches = cv2.drawMatches(
-        img0, kp0, img1, kp1, good_matches, None,
-        matchColor=(0, 255, 0), singlePointColor=None,
-        matchesMask=mask_matches, flags=2)
+        img0,
+        kp0,
+        img1,
+        kp1,
+        good_matches,
+        None,
+        matchColor=(0, 255, 0),
+        singlePointColor=None,
+        matchesMask=mask_matches,
+        flags=2,
+    )
 
     # Show the homography and good matches.
     plt.imshow(img_matches)
     plt.show()
 else:
-    print("Not enough matches good were found - %d/%d" % \
-          (len(good_matches), MIN_NUM_GOOD_MATCHES))
+    print(
+        "Not enough matches good were found - %d/%d"
+        % (len(good_matches), MIN_NUM_GOOD_MATCHES)
+    )

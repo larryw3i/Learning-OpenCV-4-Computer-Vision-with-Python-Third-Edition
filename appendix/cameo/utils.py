@@ -2,13 +2,15 @@ import cv2
 import numpy
 import scipy.interpolate
 
+
 def createFlatView(array):
     """Return a 1D view of an array of any dimensionality."""
     flatView = array.view()
     flatView.shape = array.size
     return flatView
 
-def createLookupArray(func, length = 256):
+
+def createLookupArray(func, length=256):
     """Return a lookup for whole-number inputs to a function.
 
     The lookup values are clamped to [0, length - 1].
@@ -24,11 +26,13 @@ def createLookupArray(func, length = 256):
         i += 1
     return lookupArray
 
+
 def applyLookupArray(lookupArray, src, dst):
     """Map a source to a destination using a lookup."""
     if lookupArray is None:
         return
     dst[:] = lookupArray[src]
+
 
 def createCurveFunc(points):
     """Return a function derived from control points."""
@@ -39,12 +43,12 @@ def createCurveFunc(points):
         return None
     xs, ys = zip(*points)
     if numPoints < 4:
-        kind = 'linear'
+        kind = "linear"
         # 'quadratic' is not implemented.
     else:
-        kind = 'cubic'
-    return scipy.interpolate.interp1d(xs, ys, kind,
-                                      bounds_error = False)
+        kind = "cubic"
+    return scipy.interpolate.interp1d(xs, ys, kind, bounds_error=False)
+
 
 def createCompositeFunc(func0, func1):
     """Return a composite of two functions."""
@@ -54,11 +58,13 @@ def createCompositeFunc(func0, func1):
         return func0
     return lambda x: func0(func1(x))
 
+
 def isGray(image):
     """Return True if the image has one channel per pixel."""
     return image.ndim < 3
 
+
 def widthHeightDividedBy(image, divisor):
     """Return an image's dimensions, divided by a value."""
     h, w = image.shape[:2]
-    return (w/divisor, h/divisor)
+    return (w / divisor, h / divisor)

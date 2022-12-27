@@ -3,13 +3,13 @@ import depth
 import filters
 from managers import WindowManager, CaptureManager
 
-class Cameo(object):
 
+class Cameo(object):
     def __init__(self):
-        self._windowManager = WindowManager('Cameo',
-                                            self.onKeypress)
+        self._windowManager = WindowManager("Cameo", self.onKeypress)
         self._captureManager = CaptureManager(
-            cv2.VideoCapture(0), self._windowManager, True)
+            cv2.VideoCapture(0), self._windowManager, True
+        )
         self._curveFilter = filters.BGRPortraCurveFilter()
 
     def run(self):
@@ -34,26 +34,27 @@ class Cameo(object):
         escape -> Quit.
 
         """
-        if keycode == 32: # space
-            self._captureManager.writeImage('screenshot.png')
-        elif keycode == 9: # tab
+        if keycode == 32:  # space
+            self._captureManager.writeImage("screenshot.png")
+        elif keycode == 9:  # tab
             if not self._captureManager.isWritingVideo:
-                self._captureManager.startWritingVideo(
-                    'screencast.avi')
+                self._captureManager.startWritingVideo("screencast.avi")
             else:
                 self._captureManager.stopWritingVideo()
-        elif keycode == 27: # escape
+        elif keycode == 27:  # escape
             self._windowManager.destroyWindow()
 
-class CameoDepth(Cameo):
 
+class CameoDepth(Cameo):
     def __init__(self):
-        self._windowManager = WindowManager('Cameo',
-                                            self.onKeypress)
-        #device = cv2.CAP_OPENNI2 # uncomment for Microsoft Kinect via OpenNI2
-        device = cv2.CAP_OPENNI2_ASUS # uncomment for Asus Xtion or Occipital Structure via OpenNI2
+        self._windowManager = WindowManager("Cameo", self.onKeypress)
+        # device = cv2.CAP_OPENNI2 # uncomment for Microsoft Kinect via OpenNI2
+        device = (
+            cv2.CAP_OPENNI2_ASUS
+        )  # uncomment for Asus Xtion or Occipital Structure via OpenNI2
         self._captureManager = CaptureManager(
-            cv2.VideoCapture(device), self._windowManager, True)
+            cv2.VideoCapture(device), self._windowManager, True
+        )
         self._curveFilter = filters.BGRPortraCurveFilter()
 
     def run(self):
@@ -88,6 +89,7 @@ class CameoDepth(Cameo):
             self._captureManager.exitFrame()
             self._windowManager.processEvents()
 
-if __name__=="__main__":
-    #Cameo().run() # uncomment for ordinary camera
-    CameoDepth().run() # uncomment for depth camera
+
+if __name__ == "__main__":
+    # Cameo().run() # uncomment for ordinary camera
+    CameoDepth().run()  # uncomment for depth camera
